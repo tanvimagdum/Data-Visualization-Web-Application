@@ -1,0 +1,5 @@
+pandas
+flask
+plot
+plotly-express
+psycopg2-binary

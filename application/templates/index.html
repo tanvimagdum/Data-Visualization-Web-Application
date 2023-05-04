@@ -1,0 +1,321 @@
+{% extends "template.html" %}
+{% block content%}
+    <div class="site-header-logo">
+        <h1 class="text-center">
+            ARK DASHBOARD
+        </h1>
+    </div>
+
+    <div class="row p-4">
+        <div class="card mb-4 ml-auto mr-auto" style="width: 90%;">
+            <div class="card-body">
+                <div id="chartT"></div>
+                <div class="form-group">
+                    <label for="start-time_t">Start Time:</label>
+                    <input type="datetime-local" id="start-time_t" name="start-time_t" class="form-control">
+                </div>
+                  
+                <div class="form-group">
+                    <label for="end-time_t">End Time:</label>
+                    <input type="datetime-local" id="end-time_t" name="end-time_t" class="form-control">
+                </div>
+                  
+                <button type="button" class="btn btn-primary" onclick="getChartTData()">Submit</button>  
+                <button id="refresh-button_t" class="btn btn-primary">Refresh</button>
+                <a href="{{ url_for('download_csv_t') }}" class="btn btn-primary">Download as CSV</a>
+            </div>
+        </div>
+
+        <div class="card mb-4 ml-auto mr-auto" style="width: 90%;">
+            <div class="card-body">
+                <div id="chartPH"></div>
+                <div class="form-group">
+                    <label for="start-time_ph">Start Time:</label>
+                    <input type="datetime-local" id="start-time_ph" name="start-time_ph" class="form-control">
+                </div>
+                  
+                <div class="form-group">
+                    <label for="end-time_ph">End Time:</label>
+                    <input type="datetime-local" id="end-time_ph" name="end-time_ph" class="form-control">
+                </div>
+                  
+                <button type="button" class="btn btn-primary" onclick="getChartPHData()">Submit</button>     
+                <button id="refresh-button_ph" class="btn btn-primary">Refresh</button>
+                <a href="{{ url_for('download_csv_ph') }}" class="btn btn-primary">Download as CSV</a>
+            </div>
+        </div>
+
+        <div class="card mb-4 ml-auto mr-auto" style="width: 90%;">
+            <div class="card-body">
+                <div id="chartDO"></div>
+                <div class="form-group">
+                    <label for="start-time_do">Start Time:</label>
+                    <input type="datetime-local" id="start-time_do" name="start-time_do" class="form-control">
+                </div>
+                  
+                <div class="form-group">
+                    <label for="end-time_do">End Time:</label>
+                    <input type="datetime-local" id="end-time_do" name="end-time_do" class="form-control">
+                </div>
+                  
+                <button type="button" class="btn btn-primary" onclick="getChartDOData()">Submit</button>
+                <button id="refresh-button_do" class="btn btn-primary">Refresh</button>     
+                <a href="{{ url_for('download_csv_do') }}" class="btn btn-primary">Download as CSV</a>
+            </div>
+        </div>
+
+        <div class="card mb-4 ml-auto mr-auto" style="width: 90%;">
+            <div class="card-body">
+                <div id="chartP"></div>
+                <div class="form-group">
+                    <label for="start-time_p">Start Time:</label>
+                    <input type="datetime-local" id="start-time_p" name="start-time_p" class="form-control">
+                </div>
+                  
+                <div class="form-group">
+                    <label for="end-time_p">End Time:</label>
+                    <input type="datetime-local" id="end-time_p" name="end-time_p" class="form-control">
+                </div>
+                  
+                <button type="button" class="btn btn-primary" onclick="getChartPData()">Submit</button>    
+                <button id="refresh-button_p" class="btn btn-primary">Refresh</button> 
+                <a href="{{ url_for('download_csv_p') }}" class="btn btn-primary">Download as CSV</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!--plotly CDN-->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script>
+        var graphTJSON = {{ graphTJSON | tojson }};
+        var graphT = JSON.parse(graphTJSON);
+        Plotly.newPlot("chartT", graphT, {});
+
+        var graphPHJSON = {{ graphPHJSON | tojson }};
+        var graphPH = JSON.parse(graphPHJSON);
+        Plotly.newPlot("chartPH", graphPH.data, graphPH.layout);
+
+        var graphDOJSON = {{ graphDOJSON | tojson }};
+        var graphDO = JSON.parse(graphDOJSON);
+        Plotly.newPlot("chartDO", graphDO.data, graphDO.layout);
+
+        var graphPJSON = {{ graphPJSON | tojson }};
+        var graphP = JSON.parse(graphPJSON);
+        Plotly.newPlot("chartP", graphP.data, graphP.layout);
+
+    </script>
+    <script>
+        function getChartTData() {
+            
+            // Get the values of the start and end time fields
+            var startTime = document.getElementById("start-time_t").value;
+            var endTime = document.getElementById("end-time_t").value;
+
+            // Make an AJAX request to Flask endpoint with the start and end time as parameters
+            $.ajax({
+                url: '/get_chart_data_t',
+                type: 'GET',
+                data: {
+                start_time: startTime,
+                end_time: endTime
+                },
+                success: function(response) {
+                // Update the chart with the new data
+                var graphT = JSON.parse(response);
+                Plotly.newPlot("chartT", graphT, {});
+                },
+                error: function(error) {
+                console.log(error);
+                }      
+            });
+        }
+
+        function getChartPHData() {
+            
+            // Get the values of the start and end time fields
+            var startTime = document.getElementById("start-time_ph").value;
+            var endTime = document.getElementById("end-time_ph").value;
+
+            // Make an AJAX request to Flask endpoint with the start and end time as parameters
+            $.ajax({
+                url: '/get_chart_data_ph',
+                type: 'GET',
+                data: {
+                start_time: startTime,
+                end_time: endTime
+                },
+                success: function(response) {
+                // Update the chart with the new data
+                var graphPH = JSON.parse(response);
+                Plotly.newPlot("chartPH", graphPH, {});
+                },
+                error: function(error) {
+                console.log(error);
+                }      
+            });
+        }
+
+        function getChartDOData() {
+            
+            // Get the values of the start and end time fields
+            var startTime = document.getElementById("start-time_do").value;
+            var endTime = document.getElementById("end-time_do").value;
+
+            // Make an AJAX request to Flask endpoint with the start and end time as parameters
+            $.ajax({
+                url: '/get_chart_data_do',
+                type: 'GET',
+                data: {
+                start_time: startTime,
+                end_time: endTime
+                },
+                success: function(response) {
+                // Update the chart with the new data
+                var graphDO = JSON.parse(response);
+                Plotly.newPlot("chartDO", graphDO, {});
+                },
+                error: function(error) {
+                console.log(error);
+                }      
+            });
+        }
+
+        function getChartPData() {
+            
+            // Get the values of the start and end time fields
+            var startTime = document.getElementById("start-time_p").value;
+            var endTime = document.getElementById("end-time_p").value;
+
+            // Make an AJAX request to Flask endpoint with the start and end time as parameters
+            $.ajax({
+                url: '/get_chart_data_p',
+                type: 'GET',
+                data: {
+                start_time: startTime,
+                end_time: endTime
+                },
+                success: function(response) {
+                // Update the chart with the new data
+                var graphP = JSON.parse(response);
+                Plotly.newPlot("chartP", graphP, {});
+                },
+                error: function(error) {
+                console.log(error);
+                }      
+            });
+        }
+
+    </script>
+    <script>
+        // Get a reference to the refresh button element
+        var refreshButton = document.getElementById("refresh-button_t");
+        var startTime = document.getElementById("start-time_t").value;
+        var endTime = document.getElementById("end-time_t").value;
+    
+        // Add an onclick event listener to the refresh button
+        refreshButton.onclick = function() {
+            // Make an AJAX request to the server to get the updated data
+            $.ajax({
+                url: '/get_chart_data_t',
+                type: 'GET',
+                data: {
+                    start_time: startTime,
+                    end_time: endTime
+                },
+                success: function(response) {
+                    // Update the chart with the new data
+                    var graphT = JSON.parse(response);
+                    Plotly.update("chartT", graphT, {});
+                },
+                error: function(error) {
+                    console.log(error);
+                }      
+            });
+        }
+    </script>
+    <script>
+        // Get a reference to the refresh button element
+        var refreshButton = document.getElementById("refresh-button_ph");
+        var startTime = document.getElementById("start-time_ph").value;
+        var endTime = document.getElementById("end-time_ph").value;
+    
+        // Add an onclick event listener to the refresh button
+        refreshButton.onclick = function() {
+            // Make an AJAX request to the server to get the updated data
+            $.ajax({
+                url: '/get_chart_data_ph',
+                type: 'GET',
+                data: {
+                    start_time: startTime,
+                    end_time: endTime
+                },
+                success: function(response) {
+                    // Update the chart with the new data
+                    var graphPH = JSON.parse(response);
+                    Plotly.update("chartPH", graphPH, {});
+                },
+                error: function(error) {
+                    console.log(error);
+                }      
+            });
+        }
+    </script>
+    <script>
+        // Get a reference to the refresh button element
+        var refreshButton = document.getElementById("refresh-button_do");
+        var startTime = document.getElementById("start-time_do").value;
+        var endTime = document.getElementById("end-time_do").value;
+    
+        // Add an onclick event listener to the refresh button
+        refreshButton.onclick = function() {
+            // Make an AJAX request to the server to get the updated data
+            $.ajax({
+                url: '/get_chart_data_do',
+                type: 'GET',
+                data: {
+                    start_time: startTime,
+                    end_time: endTime
+                },
+                success: function(response) {
+                    // Update the chart with the new data
+                    var graphDO = JSON.parse(response);
+                    Plotly.update("chartDO", graphDO, {});
+                },
+                error: function(error) {
+                    console.log(error);
+                }      
+            });
+        }
+    </script>
+    <script>
+        // Get a reference to the refresh button element
+        var refreshButton = document.getElementById("refresh-button_p");
+        var startTime = document.getElementById("start-time_p").value;
+        var endTime = document.getElementById("end-time_p").value;
+    
+        // Add an onclick event listener to the refresh button
+        refreshButton.onclick = function() {
+            // Make an AJAX request to the server to get the updated data
+            $.ajax({
+                url: '/get_chart_data_p',
+                type: 'GET',
+                data: {
+                    start_time: startTime,
+                    end_time: endTime
+                },
+                success: function(response) {
+                    // Update the chart with the new data
+                    var graphP = JSON.parse(response);
+                    Plotly.update("chartP", graphP, {});
+                },
+                error: function(error) {
+                    console.log(error);
+                }      
+            });
+        }
+    </script>
+
+{% endblock %}
